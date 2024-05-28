@@ -12,6 +12,7 @@
 #include <string>
 #include <cstdlib>
 #include <vector>
+#include <map>
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
@@ -136,9 +137,50 @@ private:
 		}
 	}
 
+	void setupDebugMessenger()
+	{
+
+	}
+
+	bool isDeviceSuitable(VkPhysicalDevice vkdevice)
+	{
+		VkPhysicalDeviceProperties deviceProperties;
+		VkPhysicalDeviceFeatures deviceFeatures;
+		vkGetPhysicalDeviceProperties(vkdevice, &deviceProperties);
+		vkGetPhysicalDeviceFeatures(vkdevice, &deviceFeatures);
+		return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
+			deviceFeatures.geometryShader;
+	}
+
+	void pickPhysicalDevice()
+	{
+		VkPhysicalDevice pVkPhydevice = VK_NULL_HANDLE;
+		uint32_t udeviceCount = 0;
+		std::vector<VkPhysicalDevice> devices;
+		std::multimap<int, VkPhysicalDevice> candidates;
+		vkEnumeratePhysicalDevices(m_vkInstance, &udeviceCount, nullptr);
+		if (udeviceCount == 0)
+			throw std::runtime_error("there is no physical device");
+		devices.reserve(udeviceCount);
+		vkEnumeratePhysicalDevices(m_vkInstance, &udeviceCount, devices.data());
+
+		for (auto& device : devices)
+		{
+			if (isDeviceSuitable(device))
+			{
+				pVkPhydevice = device;
+				break;
+			}
+		}
+		if (pVkPhydevice == nullptr)
+			throw std::runtime_error("no device suitable");
+	}
+
 	void initVulkan()
 	{
 		createInstance();
+		setupDebugMessenger();
+		pickPhysicalDevice();
 	}
 
 	void mainloop()
