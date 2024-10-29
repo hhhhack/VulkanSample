@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <fstream>
 #include <string>
+#include <iostream>
 
 const int cnWidth = 800;
 const int cnHeight = 600;
@@ -57,11 +58,19 @@ void OpenGl::Mainloop()
 		0, 0.5, 0 
 	};
 
+
+	Progarm program;
+	program.AddShader("../Shader/VertexShader.glsl", GL_VERTEX_SHADER);
+	program.AddShader("../Shader/FragmentShader.glsl", GL_FRAGMENT_SHADER);
+
+	program.CreateProgram();
+
 	uint32_t VBO;
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+	glEnableVertexAttribArray(0);
 
 	while (!glfwWindowShouldClose(m_pWindow))
 	{
@@ -69,6 +78,7 @@ void OpenGl::Mainloop()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		ProcessInput(m_pWindow);
 		glfwPollEvents();
+		program.UseProgaram();
 		glfwSwapBuffers(m_pWindow);
 	}
 }
@@ -78,9 +88,16 @@ void OpenGl::UnInit()
 	glfwTerminate();
 }
 
-Shader::Shader(const std::string& shaderPath)
+Shader::Shader(const std::string& shaderPath, uint32_t uShaderType)
 {
 	m_shaderFilePath = shaderPath;
+	m_uShaderType = uShaderType;
+}
+
+Shader::~Shader()
+{
+	if (m_uShader)
+		glDeleteShader(m_uShader);
 }
 
 static uint32_t GetFileSize(FILE* pFile)
@@ -111,9 +128,50 @@ void Shader::CreateShader()
 	fread(strShader, 1, uShaderFileSize, pShaderFile);
 	m_uShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(m_uShader, 1, &strShader, NULL);
-
 	glCompileShader(m_uShader);
+	int success = false;
+	glGetShaderiv(m_uShader, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		char errorBuffer[512] = { 0 };
+		glGetShaderInfoLog(m_uShader, 512, NULL, errorBuffer);
+		std::cerr << "complied shadder error " << errorBuffer << std::endl;
+	}
+
 	delete[] strShader;
 
 	fclose(pShaderFile);
+}
+
+void Progarm::AddShader(const std::string& shaderPath, uint32_t uShaderType)
+{
+	auto shader = m_shaders.emplace_back(shaderPath, uShaderType);
+	shader.CreateShader();
+}
+
+void Progarm::CreateProgram()
+{
+	m_uProgram = glCreateProgram();
+
+	for (auto shader : m_shaders)
+	{
+		glAttachShader(m_uProgram, shader.GetShader());
+	}
+
+	glLinkProgram(m_uProgram);
+	int success = 0;
+	glGetProgramiv(m_uProgram, GL_LINK_STATUS, &success);
+	if (!success)
+	{
+		char errorLog[512] = { 0 };
+		glGetProgramInfoLog(m_uProgram, 512, NULL, errorLog);
+		std::cerr << "Link program fail, error is " << errorLog << std::endl;
+	}
+
+}
+
+void Progarm::UseProgaram()
+{
+	glUseProgram(m_uProgram);
+	//glGetProgramiv(m_uProgram, )
 }
