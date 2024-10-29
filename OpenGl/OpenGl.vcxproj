@@ -146,6 +146,7 @@
     <ClInclude Include="OpenGl.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Shader\FragmentShader.glsl" />
     <None Include="..\Shader\VertexShader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

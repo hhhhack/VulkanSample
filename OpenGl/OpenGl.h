@@ -1,5 +1,11 @@
 #pragma once
 #include "GLFW/glfw3.h"
+#include <cstdio>
+#include <filesystem>
+#include <stdexcept>
+#include <fstream>
+#include <iostream>
+#include <string>
 #include <vector>
 
 class OpenGl

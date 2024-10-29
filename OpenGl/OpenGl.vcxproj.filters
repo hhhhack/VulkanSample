@@ -37,5 +37,8 @@
     <None Include="..\Shader\VertexShader.glsl">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="..\Shader\FragmentShader.glsl">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

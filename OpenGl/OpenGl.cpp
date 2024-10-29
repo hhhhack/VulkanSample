@@ -1,11 +1,7 @@
 #include "glad/glad.h"
 
 #include "OpenGl.h"
-#include <filesystem>
-#include <stdexcept>
-#include <fstream>
-#include <string>
-#include <iostream>
+
 
 const int cnWidth = 800;
 const int cnHeight = 600;
@@ -74,11 +70,12 @@ void OpenGl::Mainloop()
 
 	while (!glfwWindowShouldClose(m_pWindow))
 	{
-		glClearColor(0.123, 0.246, 0.369, 1.0);
+		glClearColor(0.123f, 0.246f, 0.369f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		ProcessInput(m_pWindow);
 		glfwPollEvents();
 		program.UseProgaram();
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glfwSwapBuffers(m_pWindow);
 	}
 }
@@ -111,22 +108,34 @@ static uint32_t GetFileSize(FILE* pFile)
 	return uFileSize;
 }
 
+template <class T>
+static uint32_t GetFileSize(T& rFile)
+{
+	uint32_t uFileSize = 0;
+	if (!rFile.is_open())
+		return uFileSize;
+	rFile.seekg(0, std::ios::end);
+	uFileSize = rFile.tellg();
+	rFile.seekg(0, std::ios::beg);
+	return uFileSize;
+}
+
 void Shader::CreateShader()
 {
 	if (!std::filesystem::exists(m_shaderFilePath))
 		throw std::runtime_error("shader file not exists");
-	FILE* pShaderFile = fopen(m_shaderFilePath.c_str(), "r");
-	//std::ifstream shaderFile(m_shaderFilePath);
-	//if (!shaderFile.is_open())
-	//	throw std::runtime_error("shader file is not open");
-	if (!pShaderFile)
-		throw std::runtime_error("open shader file fail");
-	uint32_t uShaderFileSize = GetFileSize(pShaderFile);
-	//std::string strShader;
+	
+	std::ifstream shaderFile(m_shaderFilePath);	
+	if (!shaderFile.is_open())
+		throw std::runtime_error("shader file is not open");
+
+	uint32_t uShaderFileSize = GetFileSize(shaderFile);
+	
 	char* strShader = new char[uShaderFileSize];
-	//strShader.resize(uShaderFileSize, 0);
-	fread(strShader, 1, uShaderFileSize, pShaderFile);
-	m_uShader = glCreateShader(GL_VERTEX_SHADER);
+	memset(strShader, 0, uShaderFileSize);
+
+	shaderFile.read(strShader, uShaderFileSize);
+	m_uShader = glCreateShader(m_uShaderType);
 	glShaderSource(m_uShader, 1, &strShader, NULL);
 	glCompileShader(m_uShader);
 	int success = false;
@@ -139,8 +148,6 @@ void Shader::CreateShader()
 	}
 
 	delete[] strShader;
-
-	fclose(pShaderFile);
 }
 
 void Progarm::AddShader(const std::string& shaderPath, uint32_t uShaderType)
@@ -166,8 +173,8 @@ void Progarm::CreateProgram()
 		char errorLog[512] = { 0 };
 		glGetProgramInfoLog(m_uProgram, 512, NULL, errorLog);
 		std::cerr << "Link program fail, error is " << errorLog << std::endl;
+		throw std::runtime_error("Link program fail");
 	}
-
 }
 
 void Progarm::UseProgaram()
