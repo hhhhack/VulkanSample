@@ -15,22 +15,44 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Src\main.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Src\stb_image.cpp">
+    <ClCompile Include="..\glad\src\glad.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Src\VulkanBase.cpp">
+    <ClCompile Include="OpenGl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="stb_image.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\stb_image.h">
+    <ClInclude Include="OpenGl.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Src\VulkanBase.h">
-      <Filter>源文件</Filter>
-    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Shader\VertexShader.glsl">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="..\Shader\FragmentShader.glsl">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="..\Shader\FragmentShader1.glsl">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="..\Shader\VertexShader1.glsl">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Shader\container.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\Shader\wall.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>
