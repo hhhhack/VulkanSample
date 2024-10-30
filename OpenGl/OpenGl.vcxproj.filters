@@ -40,5 +40,19 @@
     <None Include="..\Shader\FragmentShader.glsl">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="..\Shader\FragmentShader1.glsl">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="..\Shader\VertexShader1.glsl">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Shader\container.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\Shader\wall.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>

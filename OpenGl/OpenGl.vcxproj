@@ -147,7 +147,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Shader\FragmentShader.glsl" />
+    <None Include="..\Shader\FragmentShader1.glsl" />
     <None Include="..\Shader\VertexShader.glsl" />
+    <None Include="..\Shader\VertexShader1.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Shader\container.jpg" />
+    <Image Include="..\Shader\wall.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

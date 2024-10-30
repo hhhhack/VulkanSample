@@ -42,11 +42,37 @@ class Progarm
 {
 public:
 	Progarm():m_uProgram(0){};
+	Progarm(const std::string& strVertexShader, const std::string& strFragmentShader);
 	~Progarm() {};
 	void AddShader(const std::string& shaderPath, uint32_t uShaderType);
+	void AddShader(Shader &shader);
 	void CreateProgram();
 	void UseProgaram();
+	void SetBool(const std::string& strName, bool bValue);
+	void SetInt(const std::string& strName, int32_t nValue);
+	void SetFloat(const std::string& strName, float fValue);
+	uint32_t GetProgram() { return m_uProgram; };
 private:
 	std::vector<Shader> m_shaders;
 	uint32_t m_uProgram;
+};
+
+class Texture
+{
+public:
+	Texture(const std::string& picturePath) :
+		m_stexturePath(picturePath), 
+		m_pData(nullptr),
+		m_nWidth(0),
+		m_nHeight(0),
+		m_nChannel(0)
+	{};
+	~Texture() {};
+	void Load();
+private:
+	std::string m_stexturePath;
+	unsigned char* m_pData;
+	int32_t m_nWidth;
+	int32_t m_nHeight;
+	int32_t m_nChannel;
 };

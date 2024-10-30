@@ -1,6 +1,7 @@
 #include "glad/glad.h"
 
 #include "OpenGl.h"
+#include "stb_image.h"
 
 
 const int cnWidth = 800;
@@ -43,15 +44,30 @@ void OpenGl::Init()
 	glViewport(0, 0, cnWidth, cnHeight);
 
 	glfwSetFramebufferSizeCallback(m_pWindow, framBufferSizeCallBack);
-}
 
+	int nrAttributes;
+	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+	std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
+
+}
+/*Default
 void OpenGl::Mainloop()
 {
 
 	float vertices[] = {
-		-0.5, 0, 0,
-		0.5, 0, 0,
-		0, 0.5, 0 
+		0.5f, 0.5f, 0.0f,   // 右上角
+		0.5f, -0.5f, 0.0f,  // 右下角
+		-0.5f, -0.5f, 0.0f, // 左下角
+		-0.5f, 0.5f, 0.0f   // 左上角
+	};
+
+	unsigned int indices[] = {
+		// 注意索引从0开始! 
+		// 此例的索引(0,1,2,3)就是顶点数组vertices的下标，
+		// 这样可以由下标代表顶点组合成矩形
+
+		0, 1, 3, // 第一个三角形
+		1, 2, 3  // 第二个三角形
 	};
 
 
@@ -59,14 +75,21 @@ void OpenGl::Mainloop()
 	program.AddShader("../Shader/VertexShader.glsl", GL_VERTEX_SHADER);
 	program.AddShader("../Shader/FragmentShader.glsl", GL_FRAGMENT_SHADER);
 
-	program.CreateProgram();
-
-	uint32_t VBO;
+	uint32_t VBO, VAO, EBO;
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
+
+	program.CreateProgram();
 
 	while (!glfwWindowShouldClose(m_pWindow))
 	{
@@ -75,6 +98,156 @@ void OpenGl::Mainloop()
 		ProcessInput(m_pWindow);
 		glfwPollEvents();
 		program.UseProgaram();
+		glBindVertexArray(VAO);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glfwSwapBuffers(m_pWindow);
+	}
+}
+*/
+
+/*第一章
+void OpenGl::Mainloop()
+{
+
+	float vertices[] = {
+		0.5f, 0.5f, 0.0f,   // 右上角
+		0.5f, -0.5f, 0.0f,  // 右下角
+		-0.5f, -0.5f, 0.0f, // 左下角
+
+		0.5f, 0.5f, 0.0f,   // 右上角
+		-0.5f, -0.5f, 0.0f, // 左下角
+		-0.5f, 0.5f, 0.0f   // 左上角
+	};
+
+	Shader fragmentShader("../Shader/FragmentShader.glsl", GL_FRAGMENT_SHADER);
+	Shader vertexShader("../Shader/VertexShader.glsl", GL_VERTEX_SHADER);
+	Shader fragmentShader1("../Shader/FragmentShader1.glsl", GL_FRAGMENT_SHADER);
+
+	fragmentShader.CreateShader();
+	vertexShader.CreateShader();
+	fragmentShader1.CreateShader();
+
+	Progarm program1, program2;
+	program1.AddShader(vertexShader);
+	program1.AddShader(fragmentShader);
+	
+	program2.AddShader(vertexShader);
+	program2.AddShader(fragmentShader1);
+	
+	uint32_t VBO[2], VAO[2];
+	glGenVertexArrays(2, VAO);
+	glBindVertexArray(VAO[0]);
+	glGenBuffers(1, &VBO[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) / 2, vertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+	glEnableVertexAttribArray(0);
+
+	glBindVertexArray(VAO[1]);
+	glGenBuffers(1, &VBO[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) / 2, vertices + 9, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+	glEnableVertexAttribArray(0);
+
+	program1.CreateProgram();
+	program2.CreateProgram();
+	while (!glfwWindowShouldClose(m_pWindow))
+	{
+		glClearColor(0.123f, 0.246f, 0.369f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		ProcessInput(m_pWindow);
+		glfwPollEvents();
+		program1.UseProgaram();
+		glBindVertexArray(VAO[0]);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		program2.UseProgaram();
+		glBindVertexArray(VAO[1]);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glfwSwapBuffers(m_pWindow);
+	}
+}
+*/
+
+
+void OpenGl::Mainloop()
+{
+	float vertices[] = {
+	0.5f, 0.5f, 0.0f,   // 右上角
+	0.5f, -0.5f, 0.0f,  // 右下角
+	-0.5f, -0.5f, 0.0f, // 左下角
+
+	0.5f, 0.5f, 0.0f,   // 右上角
+	-0.5f, -0.5f, 0.0f, // 左下角
+	-0.5f, 0.5f, 0.0f   // 左上角
+	};
+
+	float texCoords[] = {
+		1.0f, 1.0f,
+		1.0f, 0.0f,
+		0.0f, 0.0f
+	};
+	Shader vertexShader("../Shader/VertexShader.glsl", GL_VERTEX_SHADER);
+	Shader vertexShader1("../Shader/VertexShader1.glsl", GL_VERTEX_SHADER);
+	Shader fragmentShader("../Shader/FragmentShader.glsl", GL_FRAGMENT_SHADER);
+	Shader fragmentShader1("../Shader/FragmentShader1.glsl", GL_FRAGMENT_SHADER);
+
+	Progarm program1("../Shader/VertexShader.glsl", "../Shader/FragmentShader.glsl");
+	Progarm	program2("../Shader/VertexShader1.glsl", "../Shader/FragmentShader1.glsl");
+
+	program1.CreateProgram();
+	program2.CreateProgram();
+
+	uint32_t VBO[2], VAO[2];
+	glGenVertexArrays(2, VAO);
+	glBindVertexArray(VAO[0]);
+	glGenBuffers(1, &VBO[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) / 2, vertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+	glEnableVertexAttribArray(0);
+
+	glBindVertexArray(VAO[1]);
+	glGenBuffers(1, &VBO[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) / 2, vertices + 9, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+	glEnableVertexAttribArray(0);
+
+
+	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	float textureColor[] = { 0.1f, 0.5f, 0.9f, 1.0f };
+	glTextureParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, textureColor);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+	int height, width, nrChannels;
+	unsigned char* imageData = stbi_load("../Shader/container.jpg", &width, &height, &nrChannels, 0);
+
+	uint32_t uTexture = 0;
+	glGenTextures(1, &uTexture);
+	glBindTexture(GL_TEXTURE_2D, uTexture);
+
+
+	int i = 0;
+	while (!glfwWindowShouldClose(m_pWindow))
+	{
+		glClearColor(0.123f, 0.246f, 0.369f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		ProcessInput(m_pWindow);
+		glfwPollEvents();
+		program1.UseProgaram();
+		glBindVertexArray(VAO[0]);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		program2.UseProgaram();
+		glUniform4f(glGetUniformLocation(program2.GetProgram(), "realColor"), sin(i++), cos(i), 0.0f, 1.0f);
+		glBindVertexArray(VAO[1]);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glfwSwapBuffers(m_pWindow);
 	}
@@ -89,6 +262,7 @@ Shader::Shader(const std::string& shaderPath, uint32_t uShaderType)
 {
 	m_shaderFilePath = shaderPath;
 	m_uShaderType = uShaderType;
+	m_uShader = 0;
 }
 
 Shader::~Shader()
@@ -148,21 +322,41 @@ void Shader::CreateShader()
 	}
 
 	delete[] strShader;
+	shaderFile.close();
+}
+
+Progarm::Progarm(const std::string& strVertexShader, const std::string& strFragmentShader):
+	m_uProgram(0)
+{
+	m_shaders.emplace_back(strVertexShader, GL_VERTEX_SHADER);
+	m_shaders.emplace_back(strFragmentShader, GL_FRAGMENT_SHADER);
+	for (auto& shader : m_shaders)
+		shader.CreateShader();
 }
 
 void Progarm::AddShader(const std::string& shaderPath, uint32_t uShaderType)
 {
-	auto shader = m_shaders.emplace_back(shaderPath, uShaderType);
+	auto& shader = m_shaders.emplace_back(shaderPath, uShaderType);
 	shader.CreateShader();
+}
+
+void Progarm::AddShader(Shader& shader)
+{
+	m_shaders.emplace_back(shader);
 }
 
 void Progarm::CreateProgram()
 {
 	m_uProgram = glCreateProgram();
-
+	int i = 0;
 	for (auto shader : m_shaders)
 	{
+		i++;
 		glAttachShader(m_uProgram, shader.GetShader());
+		int nShaders = 0;
+		glGetProgramiv(m_uProgram, GL_ATTACHED_SHADERS, &nShaders);
+		if (nShaders != i)
+			std::cerr << "program attach shader fail" << std::endl;
 	}
 
 	glLinkProgram(m_uProgram);
@@ -181,4 +375,28 @@ void Progarm::UseProgaram()
 {
 	glUseProgram(m_uProgram);
 	//glGetProgramiv(m_uProgram, )
+}
+
+void Progarm::SetBool(const std::string& strName, bool bValue)
+{
+	glUniform1i(glGetUniformLocation(m_uProgram, strName.c_str()), bValue);
+}
+
+void Progarm::SetInt(const std::string& strName, int32_t nValue)
+{
+	glUniform1i(glGetUniformLocation(m_uProgram, strName.c_str()), nValue);
+}
+
+void Progarm::SetFloat(const std::string& strName, float fValue)
+{
+	glUniform1i(glGetUniformLocation(m_uProgram, strName.c_str()), fValue);
+}
+
+void Texture::Load()
+{
+	m_pData = stbi_load(m_stexturePath.c_str(), &m_nWidth, &m_nHeight, &m_nChannel, 0);
+	if (!m_pData)
+	{
+		std::cerr << "load file " << m_stexturePath << " fail" << std::endl;
+	}
 }
