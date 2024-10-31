@@ -152,6 +152,7 @@
     <None Include="..\Shader\VertexShader1.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\Shader\awesomeface.png" />
     <Image Include="..\Shader\container.jpg" />
     <Image Include="..\Shader\wall.jpg" />
   </ItemGroup>

@@ -175,65 +175,47 @@ void OpenGl::Mainloop()
 void OpenGl::Mainloop()
 {
 	float vertices[] = {
-	0.5f, 0.5f, 0.0f,   // 右上角
-	0.5f, -0.5f, 0.0f,  // 右下角
-	-0.5f, -0.5f, 0.0f, // 左下角
-
-	0.5f, 0.5f, 0.0f,   // 右上角
-	-0.5f, -0.5f, 0.0f, // 左下角
-	-0.5f, 0.5f, 0.0f   // 左上角
+		//     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
+		0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
+		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
+		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
+		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
 	};
-
-	float texCoords[] = {
-		1.0f, 1.0f,
-		1.0f, 0.0f,
-		0.0f, 0.0f
+	int indices[] = {
+		0, 1, 2,
+		0, 2, 3
 	};
-	Shader vertexShader("../Shader/VertexShader.glsl", GL_VERTEX_SHADER);
-	Shader vertexShader1("../Shader/VertexShader1.glsl", GL_VERTEX_SHADER);
-	Shader fragmentShader("../Shader/FragmentShader.glsl", GL_FRAGMENT_SHADER);
-	Shader fragmentShader1("../Shader/FragmentShader1.glsl", GL_FRAGMENT_SHADER);
 
 	Progarm program1("../Shader/VertexShader.glsl", "../Shader/FragmentShader.glsl");
-	Progarm	program2("../Shader/VertexShader1.glsl", "../Shader/FragmentShader1.glsl");
 
 	program1.CreateProgram();
-	program2.CreateProgram();
 
-	uint32_t VBO[2], VAO[2];
-	glGenVertexArrays(2, VAO);
-	glBindVertexArray(VAO[0]);
-	glGenBuffers(1, &VBO[0]);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) / 2, vertices, GL_STATIC_DRAW);
+	uint32_t VBO, VAO, EBO;
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
-	glBindVertexArray(VAO[1]);
-	glGenBuffers(1, &VBO[1]);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) / 2, vertices + 9, GL_STATIC_DRAW);
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	
+	Texture texture("../Shader/container.jpg");
+	texture.Load();
+	Texture texture2("../Shader/awesomeface.png", GL_RGBA);
+	texture2.Load();
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
-	glEnableVertexAttribArray(0);
-
-
-	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-	float textureColor[] = { 0.1f, 0.5f, 0.9f, 1.0f };
-	glTextureParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, textureColor);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-	int height, width, nrChannels;
-	unsigned char* imageData = stbi_load("../Shader/container.jpg", &width, &height, &nrChannels, 0);
-
-	uint32_t uTexture = 0;
-	glGenTextures(1, &uTexture);
-	glBindTexture(GL_TEXTURE_2D, uTexture);
-
+	program1.UseProgaram();
+	program1.SetInt("ourTexture1", 0);
+	program1.SetInt("ourTexture2", 1);
 
 	int i = 0;
 	while (!glfwWindowShouldClose(m_pWindow))
@@ -242,13 +224,8 @@ void OpenGl::Mainloop()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		ProcessInput(m_pWindow);
 		glfwPollEvents();
-		program1.UseProgaram();
-		glBindVertexArray(VAO[0]);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		program2.UseProgaram();
-		glUniform4f(glGetUniformLocation(program2.GetProgram(), "realColor"), sin(i++), cos(i), 0.0f, 1.0f);
-		glBindVertexArray(VAO[1]);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glBindVertexArray(VAO);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glfwSwapBuffers(m_pWindow);
 	}
 }
@@ -392,6 +369,8 @@ void Progarm::SetFloat(const std::string& strName, float fValue)
 	glUniform1i(glGetUniformLocation(m_uProgram, strName.c_str()), fValue);
 }
 
+uint32_t Texture::m_suActiveTexture = GL_TEXTURE0;
+
 void Texture::Load()
 {
 	m_pData = stbi_load(m_stexturePath.c_str(), &m_nWidth, &m_nHeight, &m_nChannel, 0);
@@ -399,4 +378,15 @@ void Texture::Load()
 	{
 		std::cerr << "load file " << m_stexturePath << " fail" << std::endl;
 	}
+	glGenTextures(1, &m_uTexture);
+	glActiveTexture(m_suActiveTexture);
+	m_suActiveTexture++;
+	glBindTexture(GL_TEXTURE_2D, m_uTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nWidth, m_nHeight, 0, m_uTextureType, GL_UNSIGNED_BYTE, m_pData);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	stbi_image_free(m_pData);
 }
