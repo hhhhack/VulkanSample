@@ -1,6 +1,9 @@
 #include "glad/glad.h"
 
 #include "OpenGl.h"
+#include "Camera.h"
+#include "Texture.h"
+#include "Shader.h"
 #include "stb_image.h"
 
 
@@ -175,11 +178,47 @@ void OpenGl::Mainloop()
 void OpenGl::Mainloop()
 {
 	float vertices[] = {
-		//     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
-		0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
-		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
-		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
 	int indices[] = {
 		0, 1, 2,
@@ -197,26 +236,23 @@ void OpenGl::Mainloop()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (3 * sizeof(float)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) (3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
+	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (6 * sizeof(float)));
+	//glEnableVertexAttribArray(2);
 
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	//glGenBuffers(1, &EBO);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	
 	Texture texture("../Shader/container.jpg");
 	texture.Load();
 	Texture texture2("../Shader/awesomeface.png", GL_RGBA);
 	texture2.Load();
-
-	program1.UseProgaram();
-	program1.SetInt("ourTexture1", 0);
-	program1.SetInt("ourTexture2", 1);
-
+	Camera camera;
+	glEnable(GL_DEPTH_TEST);
 	int i = 0;
 	while (!glfwWindowShouldClose(m_pWindow))
 	{
@@ -225,8 +261,35 @@ void OpenGl::Mainloop()
 		ProcessInput(m_pWindow);
 		glfwPollEvents();
 		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//auto value = glm::sin(0.01f * i);
+		glm::mat4 model(1.0f);
+		model = glm::rotate(model, glm::radians(0.5f*i), glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::mat4 view(1.0f);
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		glm::mat4 projection(1.0f);
+		projection = glm::perspective(glm::radians(45.0f), float(cnWidth) / cnHeight, 0.1f, 100.0f);
+		
+		//camera.SetModel(model);
+		camera.SetView(view);
+		camera.SetPrejection(projection);
+		program1.UseProgaram();
+		program1.SetInt("ourTexture1", 0);
+		program1.SetInt("ourTexture2", 1);
+		glUniformMatrix4fv(glGetUniformLocation(program1.GetProgram(), "trans"), 1, false, glm::value_ptr(camera.GetTrans()));
+		
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		model = glm::mat4(1.0f);
+		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		model = glm::rotate(model, glm::radians(0.4f * i / 3), glm::vec3(1.0f, 0.5f, 0.2f));
+		model = glm::translate(model, glm::vec3(0.5f, 1.0f, 2.0f));
+		//camera.SetModel(model);
+		glUniformMatrix4fv(glGetUniformLocation(program1.GetProgram(), "trans"), 1, false, glm::value_ptr(camera.GetTrans()));
+
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glfwSwapBuffers(m_pWindow);
+		i++;
 	}
 }
 
@@ -235,158 +298,3 @@ void OpenGl::UnInit()
 	glfwTerminate();
 }
 
-Shader::Shader(const std::string& shaderPath, uint32_t uShaderType)
-{
-	m_shaderFilePath = shaderPath;
-	m_uShaderType = uShaderType;
-	m_uShader = 0;
-}
-
-Shader::~Shader()
-{
-	if (m_uShader)
-		glDeleteShader(m_uShader);
-}
-
-static uint32_t GetFileSize(FILE* pFile)
-{
-	uint32_t uFileSize = 0;
-	if (!pFile)
-		return uFileSize;
-	fseek(pFile, 0, SEEK_END);
-	uFileSize = ftell(pFile);
-	fseek(pFile, 0, SEEK_SET);
-	return uFileSize;
-}
-
-template <class T>
-static uint32_t GetFileSize(T& rFile)
-{
-	uint32_t uFileSize = 0;
-	if (!rFile.is_open())
-		return uFileSize;
-	rFile.seekg(0, std::ios::end);
-	uFileSize = rFile.tellg();
-	rFile.seekg(0, std::ios::beg);
-	return uFileSize;
-}
-
-void Shader::CreateShader()
-{
-	if (!std::filesystem::exists(m_shaderFilePath))
-		throw std::runtime_error("shader file not exists");
-	
-	std::ifstream shaderFile(m_shaderFilePath);	
-	if (!shaderFile.is_open())
-		throw std::runtime_error("shader file is not open");
-
-	uint32_t uShaderFileSize = GetFileSize(shaderFile);
-	
-	char* strShader = new char[uShaderFileSize];
-	memset(strShader, 0, uShaderFileSize);
-
-	shaderFile.read(strShader, uShaderFileSize);
-	m_uShader = glCreateShader(m_uShaderType);
-	glShaderSource(m_uShader, 1, &strShader, NULL);
-	glCompileShader(m_uShader);
-	int success = false;
-	glGetShaderiv(m_uShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		char errorBuffer[512] = { 0 };
-		glGetShaderInfoLog(m_uShader, 512, NULL, errorBuffer);
-		std::cerr << "complied shadder error " << errorBuffer << std::endl;
-	}
-
-	delete[] strShader;
-	shaderFile.close();
-}
-
-Progarm::Progarm(const std::string& strVertexShader, const std::string& strFragmentShader):
-	m_uProgram(0)
-{
-	m_shaders.emplace_back(strVertexShader, GL_VERTEX_SHADER);
-	m_shaders.emplace_back(strFragmentShader, GL_FRAGMENT_SHADER);
-	for (auto& shader : m_shaders)
-		shader.CreateShader();
-}
-
-void Progarm::AddShader(const std::string& shaderPath, uint32_t uShaderType)
-{
-	auto& shader = m_shaders.emplace_back(shaderPath, uShaderType);
-	shader.CreateShader();
-}
-
-void Progarm::AddShader(Shader& shader)
-{
-	m_shaders.emplace_back(shader);
-}
-
-void Progarm::CreateProgram()
-{
-	m_uProgram = glCreateProgram();
-	int i = 0;
-	for (auto shader : m_shaders)
-	{
-		i++;
-		glAttachShader(m_uProgram, shader.GetShader());
-		int nShaders = 0;
-		glGetProgramiv(m_uProgram, GL_ATTACHED_SHADERS, &nShaders);
-		if (nShaders != i)
-			std::cerr << "program attach shader fail" << std::endl;
-	}
-
-	glLinkProgram(m_uProgram);
-	int success = 0;
-	glGetProgramiv(m_uProgram, GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		char errorLog[512] = { 0 };
-		glGetProgramInfoLog(m_uProgram, 512, NULL, errorLog);
-		std::cerr << "Link program fail, error is " << errorLog << std::endl;
-		throw std::runtime_error("Link program fail");
-	}
-}
-
-void Progarm::UseProgaram()
-{
-	glUseProgram(m_uProgram);
-	//glGetProgramiv(m_uProgram, )
-}
-
-void Progarm::SetBool(const std::string& strName, bool bValue)
-{
-	glUniform1i(glGetUniformLocation(m_uProgram, strName.c_str()), bValue);
-}
-
-void Progarm::SetInt(const std::string& strName, int32_t nValue)
-{
-	glUniform1i(glGetUniformLocation(m_uProgram, strName.c_str()), nValue);
-}
-
-void Progarm::SetFloat(const std::string& strName, float fValue)
-{
-	glUniform1i(glGetUniformLocation(m_uProgram, strName.c_str()), fValue);
-}
-
-uint32_t Texture::m_suActiveTexture = GL_TEXTURE0;
-
-void Texture::Load()
-{
-	m_pData = stbi_load(m_stexturePath.c_str(), &m_nWidth, &m_nHeight, &m_nChannel, 0);
-	if (!m_pData)
-	{
-		std::cerr << "load file " << m_stexturePath << " fail" << std::endl;
-	}
-	glGenTextures(1, &m_uTexture);
-	glActiveTexture(m_suActiveTexture);
-	m_suActiveTexture++;
-	glBindTexture(GL_TEXTURE_2D, m_uTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nWidth, m_nHeight, 0, m_uTextureType, GL_UNSIGNED_BYTE, m_pData);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	stbi_image_free(m_pData);
-}
