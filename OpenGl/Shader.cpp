@@ -1,6 +1,12 @@
 #include "Shader.h"
 #include "glad/glad.h"
 
+#include <cstdio>
+#include <filesystem>
+#include <stdexcept>
+#include <fstream>
+#include <iostream>
+
 Shader::Shader(const std::string& shaderPath, uint32_t uShaderType)
 {
 	m_shaderFilePath = shaderPath;
@@ -135,6 +141,11 @@ void Progarm::SetInt(const std::string& strName, int32_t nValue)
 void Progarm::SetFloat(const std::string& strName, float fValue)
 {
 	glUniform1i(glGetUniformLocation(m_uProgram, strName.c_str()), fValue);
+}
+
+void Progarm::SetVec3(const std::string& strName, glm::vec3&& Value)
+{
+	glUniform3f(glGetUniformLocation(m_uProgram, strName.c_str()), Value.x, Value.y, Value.z);
 }
 
 

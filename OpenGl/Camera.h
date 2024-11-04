@@ -4,20 +4,35 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+enum class InputDirection
+{
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT
+};
+
 class Camera
 {
 public:
 	Camera();
 	Camera(glm::vec3 cameraUp, glm::vec3 cameraPos, glm::vec3 cameraTarge);
-	//void SetModel(glm::mat4 model) { m_model = model; };
-	void SetView(glm::mat4 view) { m_view = view; };
-	void SetPrejection(glm::mat4 prejection) { m_prejection = prejection; };
-	glm::mat4 GetTrans() { return m_prejection * m_view; };
+	glm::mat4 GetView();
+	void ProcessKeyBordInput(InputDirection direction, float fDeltaTime);
+	void ProcessMouseInput(float fOffsetX, float fOffsetY);
 private:
-	glm::vec3 m_cameraDirection;
-	glm::vec3 m_cameraRight;
+	void UpdateCamera();
+
+public:
+	glm::vec3 m_cameraPos;
+	glm::vec3 m_cameraTarget;
 	glm::vec3 m_cameraUp;
-	glm::mat4 m_view;
-	glm::mat4 m_prejection;
-	glm::mat4 m_trans;
+	glm::vec3 m_cameraFront;
+	glm::vec3 m_cameraRight;
+	glm::vec3 m_cameraWorldUp;
+	float m_fyaw;
+	float m_fpitch;
+	static float m_sfspeed;
+	static float m_sfsensitivity;
+	float m_fzoom;
 };

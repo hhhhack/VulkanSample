@@ -1,9 +1,5 @@
 #pragma once
-#include <cstdio>
-#include <filesystem>
-#include <stdexcept>
-#include <fstream>
-#include <iostream>
+#include "glm/glm.hpp"
 #include <string>
 #include <vector>
 
@@ -33,6 +29,7 @@ public:
 	void SetBool(const std::string& strName, bool bValue);
 	void SetInt(const std::string& strName, int32_t nValue);
 	void SetFloat(const std::string& strName, float fValue);
+	void SetVec3(const std::string& strNmae, glm::vec3&& Value);
 	uint32_t GetProgram() { return m_uProgram; };
 private:
 	std::vector<Shader> m_shaders;

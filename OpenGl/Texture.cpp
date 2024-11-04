@@ -1,5 +1,7 @@
 #include "Texture.h"
-#include "glad/glad.h"
+
+#include <iostream>
+
 #include "stb_image.h"
 
 uint32_t Texture::m_suActiveTexture = GL_TEXTURE0;

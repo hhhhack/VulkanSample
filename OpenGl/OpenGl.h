@@ -1,16 +1,5 @@
 #pragma once
 #include "GLFW/glfw3.h"
-#include <cstdio>
-#include <filesystem>
-#include <stdexcept>
-#include <fstream>
-#include <iostream>
-#include <string>
-#include <vector>
-
-#include "glm/glm.hpp"
-#include "glm/gtc/type_ptr.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 
 class OpenGl
 {

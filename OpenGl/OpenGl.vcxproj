@@ -138,16 +138,25 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\glad\src\glad.c" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OpenGl.cpp" />
+    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="stb_image.cpp" />
+    <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="OpenGl.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Shader\FragmentShader.glsl" />
     <None Include="..\Shader\FragmentShader1.glsl" />
+    <None Include="..\Shader\lightFragment.glsl" />
+    <None Include="..\Shader\lightSourceFragment.glsl" />
+    <None Include="..\Shader\lightVertex.glsl" />
     <None Include="..\Shader\VertexShader.glsl" />
     <None Include="..\Shader\VertexShader1.glsl" />
   </ItemGroup>
