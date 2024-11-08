@@ -152,18 +152,19 @@
     <ClInclude Include="Texture.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Shader\FragmentShader.glsl" />
-    <None Include="..\Shader\FragmentShader1.glsl" />
-    <None Include="..\Shader\lightFragment.glsl" />
-    <None Include="..\Shader\lightSourceFragment.glsl" />
-    <None Include="..\Shader\lightVertex.glsl" />
-    <None Include="..\Shader\VertexShader.glsl" />
-    <None Include="..\Shader\VertexShader1.glsl" />
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="..\Shader\awesomeface.png" />
     <Image Include="..\Shader\container.jpg" />
     <Image Include="..\Shader\wall.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Shader\FragmentShader.fs" />
+    <None Include="..\Shader\FragmentShader1.fs" />
+    <None Include="..\Shader\lightFragment.fs" />
+    <None Include="..\Shader\lightsource.vs" />
+    <None Include="..\Shader\lightSourceFragment.fs" />
+    <None Include="..\Shader\lightVertex.vs" />
+    <None Include="..\Shader\VertexShader.vs" />
+    <None Include="..\Shader\VertexShader1.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

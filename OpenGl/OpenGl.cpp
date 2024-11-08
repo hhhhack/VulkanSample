@@ -399,8 +399,8 @@ void OpenGl::Mainloop()
 		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 	};
 
-	Progarm program1("../Shader/lightVertex.glsl", "../Shader/lightFragment.glsl");
-	Progarm program2("../Shader/lightsource.glsl", "../Shader/lightSourceFragment.glsl");
+	Progarm program1("../Shader/lightVertex.vs", "../Shader/lightFragment.fs");
+	Progarm program2("../Shader/lightsource.vs", "../Shader/lightSourceFragment.fs");
 	program1.CreateProgram();
 	program2.CreateProgram();
 
@@ -422,11 +422,11 @@ void OpenGl::Mainloop()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
 
-	Texture texture("../Shader/container.jpg");
-	texture.Load();
-	Texture texture2("../Shader/awesomeface.png", GL_RGBA);
-	texture2.Load();
-
+	//Texture texture("../Shader/container.jpg");
+	//texture.Load();
+	//Texture texture2("../Shader/awesomeface.png", GL_RGBA);
+	//texture2.Load();
+	glm::vec3 lightPos(1.2f, 1.0f, -2.0f);
 	glEnable(GL_DEPTH_TEST);
 	int i = 0;
 	while (!glfwWindowShouldClose(m_pWindow))
@@ -436,9 +436,12 @@ void OpenGl::Mainloop()
 		ProcessInput(m_pWindow, camera);
 		glfwPollEvents();
 		float angle = 0.05f * i;
+		
 		program1.UseProgaram();
 		program1.SetVec3("light", glm::vec3(1.0f, 1.0f, 1.0f));
 		program1.SetVec3("color", glm::vec3(1.0f, 0.5f, 0.1f));
+		program1.SetVec3("lightPos", lightPos);
+		program1.SetVec3("ViewPos", camera.m_cameraPos);
 		glm::mat4 projection(1.0f);
 		projection = glm::perspective(glm::radians(45.0f), float(cnWidth) / cnHeight, 0.1f, 100.0f);
 
@@ -448,7 +451,7 @@ void OpenGl::Mainloop()
 		glBindVertexArray(VAO);
 		
 		glm::mat4 model(1.0f);
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+		//model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 		glUniformMatrix4fv(glGetUniformLocation(program1.GetProgram(), "model"), 1, false, glm::value_ptr(model));
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -459,10 +462,11 @@ void OpenGl::Mainloop()
 		glBindVertexArray(ulightVAO);
 
 		model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-		model = glm::scale(model, glm::vec3(0.2, 0.2, 0.2));
-		model = glm::translate(model, glm::vec3(1.2, 1.0, 2.0));
 		
+		model = glm::translate(model, lightPos);
+		///model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+		model = glm::scale(model, glm::vec3(0.2));
+				
 		glUniformMatrix4fv(glGetUniformLocation(program2.GetProgram(), "model"), 1, false, glm::value_ptr(model));
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 

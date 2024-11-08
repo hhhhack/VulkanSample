@@ -1,5 +1,5 @@
 #include "Shader.h"
-#include "glad/glad.h"
+//#include "glad/glad.h"
 
 #include <cstdio>
 #include <filesystem>
@@ -142,10 +142,4 @@ void Progarm::SetFloat(const std::string& strName, float fValue)
 {
 	glUniform1i(glGetUniformLocation(m_uProgram, strName.c_str()), fValue);
 }
-
-void Progarm::SetVec3(const std::string& strName, glm::vec3&& Value)
-{
-	glUniform3f(glGetUniformLocation(m_uProgram, strName.c_str()), Value.x, Value.y, Value.z);
-}
-
 

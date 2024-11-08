@@ -1,5 +1,6 @@
 #pragma once
 #include "glm/glm.hpp"
+#include "glad/glad.h"
 #include <string>
 #include <vector>
 
@@ -29,7 +30,11 @@ public:
 	void SetBool(const std::string& strName, bool bValue);
 	void SetInt(const std::string& strName, int32_t nValue);
 	void SetFloat(const std::string& strName, float fValue);
-	void SetVec3(const std::string& strNmae, glm::vec3&& Value);
+	template <typename T>
+	inline void SetVec3(const std::string& strName, T&& Value)
+	{
+		glUniform3f(glGetUniformLocation(m_uProgram, strName.c_str()), Value.x, Value.y, Value.z);
+	};
 	uint32_t GetProgram() { return m_uProgram; };
 private:
 	std::vector<Shader> m_shaders;
