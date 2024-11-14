@@ -35,6 +35,7 @@ public:
 	{
 		glUniform3f(glGetUniformLocation(m_uProgram, strName.c_str()), Value.x, Value.y, Value.z);
 	};
+	void SetVec3(const std::string& strName, float fValue1, float fValue2, float fValue3);
 	uint32_t GetProgram() { return m_uProgram; };
 private:
 	std::vector<Shader> m_shaders;
